@@ -2,11 +2,14 @@ import serial
 import time
 
 arduinoData = serial.Serial('/dev/cu.usbmodem143101',9600)
-signal = int(input("please type command: "))
-print("signal = ", signal)
-time.sleep(2)
-if signal == 1:
-	arduinoData.write(b'1')
-else:
-	arduinoData.write(b'0')
-print("done")
+# if signal == 1:
+# 	arduinoData.write(b'1')
+# else:
+# 	arduinoData.write(b'0')
+while True:
+	signal = input("please type command: ")
+	if signal.isdigit():
+		print("signal = ", signal)
+		arduinoData.write(signal.encode())
+	else:
+		break
