@@ -37,7 +37,7 @@ void loop() {
           pos++;
           bottomServo.write(pos);
           Serial.println(pos);
-          delay(20);
+          delay(10);
         }
       } else {
         Serial.write("target < currentPosition");
@@ -45,7 +45,7 @@ void loop() {
           pos--;
           bottomServo.write(pos);
           Serial.println(pos);
-          delay(20);
+          delay(10);
         }
       }
       currentPosition = target;
