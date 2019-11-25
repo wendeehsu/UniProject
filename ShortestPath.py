@@ -76,6 +76,16 @@ def CleanPoints(pos, nestPos, matrix):
 					matrix[i,j] = 0
 	return matrix
 
+def ClearPointsInRange(pos, r, matrix):
+	matrix[pos[0]][pos[1]] = 0
+	for i in range(pos[0]-r, pos[0]+r+1):
+		if i >= 0 and i < MaxSize:
+			for j in range(pos[1]-r, pos[1]+r+1):
+				if j >= 0 and j < MaxSize:
+					if matrix[i][j] == 1 and distance([i,j],pos) <= r*r:  # get points in radius = r
+						matrix[i][j] = 0
+	return matrix
+
 def GetNextP(pos, matrix, prevPos, r = 2): # 找下一個點
 # 	print("pos = ", pos)
 	matrix[pos[0]][pos[1]] = 0
@@ -95,7 +105,7 @@ def GetNextP(pos, matrix, prevPos, r = 2): # 找下一個點
 			prevVector = [pos[0] - prevPos[0], pos[1] - prevPos[1]]
 			nextPos = ChoosePoint(candidates, pos, prevVector)
 		
-		matrix = CleanPoints(pos,nextPos,matrix)
+		matrix = ClearPointsInRange(pos,r,matrix)
 		return nextPos, matrix
 	else:
 		if r >= 40:
