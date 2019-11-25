@@ -45,39 +45,39 @@ def SetMatrix(points):
 def CleanPoints(pos, nestPos, matrix):
 	if nestPos[0] > pos[0]:     # 往右走  
 		if nestPos[1] > pos[1]: # 往上走
-			for i in range(pos[0], nestPos[0]):
-				for j in range(pos[1], nestPos[1]):
+			for i in range(pos[0], nestPos[0]+1):
+				for j in range(pos[1], nestPos[1]+1):
 					matrix[i,j] = 0
 		elif nestPos[1] == pos[1]:
-			for i in range(pos[0], nestPos[0]):
+			for i in range(pos[0], nestPos[0]+1):
 				matrix[i,pos[1]] = 0
 		else:                    # 往下走
-			for i in range(pos[0], nestPos[0]):
-				for j in range(pos[1]+1, nestPos[1]+1):
+			for i in range(pos[0], nestPos[0]+1):
+				for j in range(nestPos[1], pos[1]+1):
 					matrix[i,j] = 0
 	elif nestPos[0] == pos[0]:
 		if nestPos[1] > pos[1]:
-			for j in range(pos[1], nestPos[1]):
+			for j in range(pos[1], nestPos[1]+1):
 				matrix[nestPos[0],j] = 0
 		else:
-			for j in range(nestPos[1]+1, pos[1]+1):
+			for j in range(nestPos[1], pos[1]+1):
 				matrix[nestPos[0],j] = 0
 	else:                        # 往左走  
 		if nestPos[1] > pos[1]:  # 往上走
-			for i in range(nestPos[0]+1, pos[0]+1):
-				for j in range(min(pos[1], nestPos[1]), max(pos[1], nestPos[1])):
+			for i in range(nestPos[0], pos[0]+1):
+				for j in range(pos[1], nestPos[1]+1):
 					matrix[i,j] = 0
 		elif nestPos[1] == pos[1]:
-			for i in range(nestPos[0]+1, pos[0]+1):
+			for i in range(nestPos[0], pos[0]+1):
 				matrix[i,pos[1]] = 0
 		else:                    # 往下走
-			for i in range(nestPos[0]+1, pos[0]+1):
-				for j in range(min(pos[1], nestPos[1])+1, max(pos[1], nestPos[1])+1):
+			for i in range(nestPos[0], pos[0]+1):
+				for j in range(nestPos[1], pos[1]+1):
 					matrix[i,j] = 0
 	return matrix
 
 def GetNextP(pos, matrix, prevPos, r = 2): # 找下一個點
-	print("pos = ", pos)
+# 	print("pos = ", pos)
 	matrix[pos[0]][pos[1]] = 0
 	candidates = []
 	for i in range(pos[0]-r, pos[0]+r+1):
@@ -86,7 +86,7 @@ def GetNextP(pos, matrix, prevPos, r = 2): # 找下一個點
 				if j >= 0 and j < MaxSize:
 					if matrix[i][j] == 1 and distance([i,j],pos) <= r*r:  # get points in radius = r
 						candidates.append([i,j])
-	print("candidates = ", candidates)
+# 	print("candidates = ", candidates)
 	numOfCandidates = len(candidates)
 	if numOfCandidates > 0:
 		if numOfCandidates == 1:
@@ -96,12 +96,11 @@ def GetNextP(pos, matrix, prevPos, r = 2): # 找下一個點
 			nextPos = ChoosePoint(candidates, pos, prevVector)
 		
 		matrix = CleanPoints(pos,nextPos,matrix)
-		print("nextPos = ", nextPos)
-		print("matrix = ", sum(sum(matrix)))
 		return nextPos, matrix
 	else:
-		print("next loop r = ", r+2)
-		return GetNextP(pos, matrix, prevPos, r + 2)
+		if r >= 40:
+			return pos, np.zeros((MaxSize,MaxSize))
+		return GetNextP(pos, matrix, prevPos, r + r)
 
 """
 1. find max cosines
@@ -124,25 +123,24 @@ def ChoosePoint(candidates, pos, prevVector):
 			tempPoint = candidates[i]
 	return tempPoint
 
-def DFS(points):
+def DFS(points, r = 2, tolerance = 5):
 	currentP = GetStart(points)
 	rawMatrix = SetMatrix(points)
 	lastP = [MaxSize-1,MaxSize-1]
 	path = [currentP]
 	while sum(sum(rawMatrix)) > 0:
-		nextPos, rawMatrix = GetNextP(currentP, rawMatrix, lastP)
+		nextPos, rawMatrix = GetNextP(currentP, rawMatrix, lastP, r)
 		path.append(nextPos)
 		lastP = currentP
 		currentP = nextPos
-		print("currentP = ",lastP,"nextPos = ", currentP)
-		if sum(sum(rawMatrix)) <= 1:
+		if sum(sum(rawMatrix)) <= tolerance:
 			break
 	return path
 
 
 points = []
-MaxSize = 150
-"""
+MaxSize = 500
+
 with open('points.pickle', 'rb') as file:
 	points = pickle.load(file)
 
@@ -150,7 +148,6 @@ with open('points.pickle', 'rb') as file:
 allpoints = []
 for i in points:
 	allpoints += i
-Show(allpoints)
 
 # show parts
 Show(allpoints)
@@ -164,4 +161,4 @@ Show(points)
 catPath = DFS(points)
 ShowLine(catPath)
 ShowLineWithoutNoise(catPath)
-
+"""
