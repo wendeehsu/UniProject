@@ -9,3 +9,5 @@
 cnn
 
 model-resnet50-final2.h5
+
+*.pptx
