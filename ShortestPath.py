@@ -42,40 +42,6 @@ def SetMatrix(points):
 		zeors_array[p[0]][p[1]] = 1
 	return zeors_array
 
-def CleanPoints(pos, nestPos, matrix):
-	if nestPos[0] > pos[0]:     # 往右走  
-		if nestPos[1] > pos[1]: # 往上走
-			for i in range(pos[0], nestPos[0]+1):
-				for j in range(pos[1], nestPos[1]+1):
-					matrix[i,j] = 0
-		elif nestPos[1] == pos[1]:
-			for i in range(pos[0], nestPos[0]+1):
-				matrix[i,pos[1]] = 0
-		else:                    # 往下走
-			for i in range(pos[0], nestPos[0]+1):
-				for j in range(nestPos[1], pos[1]+1):
-					matrix[i,j] = 0
-	elif nestPos[0] == pos[0]:
-		if nestPos[1] > pos[1]:
-			for j in range(pos[1], nestPos[1]+1):
-				matrix[nestPos[0],j] = 0
-		else:
-			for j in range(nestPos[1], pos[1]+1):
-				matrix[nestPos[0],j] = 0
-	else:                        # 往左走  
-		if nestPos[1] > pos[1]:  # 往上走
-			for i in range(nestPos[0], pos[0]+1):
-				for j in range(pos[1], nestPos[1]+1):
-					matrix[i,j] = 0
-		elif nestPos[1] == pos[1]:
-			for i in range(nestPos[0], pos[0]+1):
-				matrix[i,pos[1]] = 0
-		else:                    # 往下走
-			for i in range(nestPos[0], pos[0]+1):
-				for j in range(nestPos[1], pos[1]+1):
-					matrix[i,j] = 0
-	return matrix
-
 def ClearPointsInRange(pos, r, matrix):
 	matrix[pos[0]][pos[1]] = 0
 	for i in range(pos[0]-r, pos[0]+r+1):
@@ -151,7 +117,7 @@ def DFS(points, r = 2, tolerance = 5):
 points = []
 MaxSize = 500
 
-with open('points.pickle', 'rb') as file:
+with open('doggie.pickle', 'rb') as file:
 	points = pickle.load(file)
 
 # show full graph
@@ -159,16 +125,22 @@ allpoints = []
 for i in points:
 	allpoints += i
 
-# show parts
-Show(allpoints)
-path = DFS(allpoints)
-ShowLine(path)
-ShowLineWithoutNoise(path)
-"""
-with open('catpoints', 'rb') as file:
-	points = pickle.load(file)
-Show(points)
-catPath = DFS(points)
-ShowLine(catPath)
-ShowLineWithoutNoise(catPath)
-"""
+finalPath = []
+i = 0
+for section in points:
+    p = DFS(section,4)
+    print(i," : ",len(p))
+    i += 1
+    finalPath.append(p)
+
+for section in finalPath:
+    for i in range(len(section)-1):
+        plt.plot([section[i][0],section[i+1][0]],[section[i][1],section[i+1][1]])
+plt.show()
+
+name = 'path/test_trace.pickle'
+with open(name, 'wb') as handle:
+    pickle.dump(finalPath, handle)
+with open(name, 'rb') as handle:
+    t = pickle.load(handle)
+print(t)
